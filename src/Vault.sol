@@ -21,7 +21,14 @@ contract Vault {
         address indexed asset
     );
 
-    constructor(address _safe, address _leader, address _asset) {
+    constructor() {}
+
+    function initialize(address _safe, address _leader, address _asset) external {
+        require(address(asset) == address(0), "ALREADY_INITIALIZED");
+        require(_safe != address(0), "INVALID_SAFE");
+        require(_leader != address(0), "INVALID_LEADER");
+        require(_asset != address(0), "INVALID_ASSET");
+
         safe = _safe;
         leader = _leader;
         asset = IERC20(_asset);
