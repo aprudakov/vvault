@@ -2,11 +2,7 @@
 pragma solidity ^0.8.13;
 
 interface IERC20 {
-    function transferFrom(
-        address from,
-        address to,
-        uint256 value
-    ) external returns (bool);
+    function transferFrom(address from, address to, uint256 value) external returns (bool);
 }
 
 contract Vault {
@@ -15,11 +11,7 @@ contract Vault {
     IERC20 public asset;
 
     event Deposited(address indexed user, uint256 amount);
-    event VaultInitialized(
-        address indexed safe,
-        address indexed leader,
-        address indexed asset
-    );
+    event VaultInitialized(address indexed safe, address indexed leader, address indexed asset);
 
     constructor() {}
 
@@ -37,10 +29,7 @@ contract Vault {
     }
 
     function deposit(uint256 amount) external {
-        require(
-            asset.transferFrom(msg.sender, safe, amount),
-            "TRANSFER_FAILED"
-        );
+        require(asset.transferFrom(msg.sender, safe, amount), "TRANSFER_FAILED");
         emit Deposited(msg.sender, amount);
     }
 }

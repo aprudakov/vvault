@@ -10,17 +10,9 @@ contract VaultFactory {
     address public safeProxyFactory;
     IERC20 public asset;
 
-    event VaultCreated(
-        address indexed vault,
-        address indexed safe,
-        address indexed leader
-    );
+    event VaultCreated(address indexed vault, address indexed safe, address indexed leader);
 
-    constructor(
-        address _safeSingleton,
-        address _safeProxyFactory,
-        address _asset
-    ) {
+    constructor(address _safeSingleton, address _safeProxyFactory, address _asset) {
         require(_safeSingleton != address(0), "INVALID_SAFE_SINGLETON");
         require(_safeProxyFactory != address(0), "INVALID_SAFE_PROXY_FACTORY");
         require(_asset != address(0), "INVALID_ASSET");
@@ -30,10 +22,7 @@ contract VaultFactory {
         asset = IERC20(_asset);
     }
 
-    function createVault(
-        address leader,
-        uint256 saltNonce
-    ) external returns (address vault, address safe) {
+    function createVault(address leader, uint256 saltNonce) external returns (address vault, address safe) {
         require(leader != address(0), "INVALID_LEADER");
 
         //TODO: Make protocol owner owner
@@ -41,24 +30,10 @@ contract VaultFactory {
         owners[0] = leader;
         //TODO: Add safe transaction guards
         bytes memory initializer = abi.encodeWithSelector(
-            ISafe.setup.selector,
-            owners,
-            1,
-            address(0),
-            bytes(""),
-            address(0),
-            address(0),
-            0,
-            payable(address(0))
+            ISafe.setup.selector, owners, 1, address(0), bytes(""), address(0), address(0), 0, payable(address(0))
         );
 
-        safe = address(
-            SafeProxyFactory(safeProxyFactory).createProxyWithNonce(
-                safeSingleton,
-                initializer,
-                saltNonce
-            )
-        );
+        safe = address(SafeProxyFactory(safeProxyFactory).createProxyWithNonce(safeSingleton, initializer, saltNonce));
 
         Vault newVault = new Vault();
         newVault.initialize(safe, leader, address(asset));
