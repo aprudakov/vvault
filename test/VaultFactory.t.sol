@@ -21,11 +21,7 @@ contract MockUSDCe {
         return true;
     }
 
-    function transferFrom(
-        address from,
-        address to,
-        uint256 amount
-    ) external returns (bool) {
+    function transferFrom(address from, address to, uint256 amount) external returns (bool) {
         uint256 allowed = allowances[from][msg.sender];
         require(allowed >= amount, "INSUFFICIENT_ALLOWANCE");
         require(balances[from] >= amount, "INSUFFICIENT_BALANCE");
@@ -55,20 +51,13 @@ contract VaultFactoryTest is Test {
 
         safeSingleton = new Safe();
         safeProxyFactory = new SafeProxyFactory();
-        vaultFactory = new VaultFactory(
-            address(safeSingleton),
-            address(safeProxyFactory),
-            address(usdcE)
-        );
+        vaultFactory = new VaultFactory(address(safeSingleton), address(safeProxyFactory), address(usdcE));
     }
 
     function test_CreateVault_InitializesVaultAndSafe() public {
         uint256 saltNonce = 1;
 
-        (address vaultAddress, address safeAddress) = vaultFactory.createVault(
-            leader,
-            saltNonce
-        );
+        (address vaultAddress, address safeAddress) = vaultFactory.createVault(leader, saltNonce);
 
         Vault vault = Vault(vaultAddress);
         ISafe safe = ISafe(payable(safeAddress));
@@ -88,10 +77,7 @@ contract VaultFactoryTest is Test {
         uint256 amount = 250e6;
         address depositor = makeAddr("depositor");
 
-        (address vaultAddress, address safeAddress) = vaultFactory.createVault(
-            leader,
-            saltNonce
-        );
+        (address vaultAddress, address safeAddress) = vaultFactory.createVault(leader, saltNonce);
         Vault vault = Vault(vaultAddress);
 
         usdcE.mint(depositor, amount);
@@ -106,16 +92,8 @@ contract VaultFactoryTest is Test {
         uint256 safeBalanceAfter = usdcE.balanceOf(safeAddress);
         uint256 vaultBalanceAfter = usdcE.balanceOf(vaultAddress);
 
-        assertEq(
-            safeBalanceAfter,
-            safeBalanceBefore + amount,
-            "safe did not receive deposited funds"
-        );
-        assertEq(
-            vaultBalanceAfter,
-            vaultBalanceBefore,
-            "vault custody changed unexpectedly"
-        );
+        assertEq(safeBalanceAfter, safeBalanceBefore + amount, "safe did not receive deposited funds");
+        assertEq(vaultBalanceAfter, vaultBalanceBefore, "vault custody changed unexpectedly");
         assertEq(vaultBalanceAfter, 0, "vault should not retain asset custody");
     }
 }
